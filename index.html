@@ -1,0 +1,509 @@
+!DOCTYPE html
+html lang=bn class=scroll-smooth
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    titleDeep Focus Protocol  Academic Research Editiontitle
+    
+    !-- Fonts Noto Sans for UI, Merriweather for Paper --
+    link href=httpsfonts.googleapis.comcss2family=Noto+Sans+Bengaliwght@300;400;500;600;700&display=swap rel=stylesheet
+    link href=httpsfonts.googleapis.comcss2family=Merriweatherwght@300;400;700;900&display=swap rel=stylesheet
+    
+    !-- Tailwind CSS --
+    script src=httpscdn.tailwindcss.comscript
+    
+    !-- Chart.js --
+    script src=httpscdn.jsdelivr.netnpmchart.jsscript
+
+    !-- Tailwind Config --
+    script
+        tailwind.config = {
+            darkMode 'class',
+            theme {
+                extend {
+                    colors {
+                        bg {
+                            main '#0f172a',  Slate 900
+                            card '#1e293b',  Slate 800
+                            paper '#121212',  Reader BG
+                        },
+                        accent {
+                            primary '#10B981',  Emerald
+                            secondary '#F59E0B',  Amber
+                            alert '#EF4444',  Red
+                        }
+                    },
+                    fontFamily {
+                        sans ['Noto Sans Bengali', 'sans-serif'],
+                        serif ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    script
+
+    style
+        body { background-color #0f172a; color #e2e8f0; }
+        
+         Custom Scrollbar 
+        -webkit-scrollbar { width 8px; }
+        -webkit-scrollbar-track { background #0f172a; }
+        -webkit-scrollbar-thumb { background #334155; border-radius 4px; }
+        -webkit-scrollbar-thumbhover { background #475569; }
+
+         Glassmorphism 
+        .glass {
+            background rgba(30, 41, 59, 0.7);
+            backdrop-filter blur(10px);
+            border 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+         Paper Reading Mode Styling 
+        .paper-content {
+            font-family 'Merriweather', serif;
+            line-height 1.9;
+            color #d1d5db;
+        }
+        .paper-heading {
+            color #10B981;
+            border-bottom 2px solid #334155;
+            padding-bottom 0.5rem;
+            margin-top 2.5rem;
+            margin-bottom 1.5rem;
+            font-weight 700;
+        }
+        .paper-subheading {
+            color #F59E0B;
+            font-weight 600;
+            margin-top 1.5rem;
+            margin-bottom 0.75rem;
+        }
+        
+         Modal Animation 
+        .modal {
+            transition opacity 0.3s ease, pointer-events 0.3s ease;
+            opacity 0;
+            pointer-events none;
+        }
+        .modal.active {
+            opacity 1;
+            pointer-events all;
+        }
+    style
+head
+body class=antialiased
+
+    !-- Navigation --
+    nav class=fixed w-full z-50 glass border-b border-slate-700
+        div class=max-w-7xl mx-auto px-4 smpx-6 lgpx-8
+            div class=flex justify-between h-16 items-center
+                div class=flex items-center gap-2
+                    div class=bg-accent-primary20 p-2 rounded-lg
+                        span class=text-xl🧠span
+                    div
+                    div
+                        span class=text-xl font-bold text-white tracking-wideDeepFocusspan
+                        span class=text-[10px] text-accent-secondary block uppercase tracking-widestProtocol v2.0span
+                    div
+                div
+                
+                div class=hidden mdflex space-x-8 text-sm font-medium
+                    a href=#hero class=hovertext-accent-primary transitionHomea
+                    a href=#tools class=hovertext-accent-primary transitionToolsa
+                    a href=#paper class=hovertext-accent-primary transitionResearch Papera
+                div
+
+                div class=flex items-center gap-4
+                    button onclick=toggleModal() class=text-xs text-gray-400 hovertext-white border border-slate-600 px-3 py-1 rounded-full transition
+                        Dev Info
+                    button
+                    a href=#tools class=bg-accent-primary hoverbg-emerald-600 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg shadow-emerald-90050 transition
+                        Start Session
+                    a
+                div
+            div
+        div
+    nav
+
+    !-- Developer Modal --
+    div id=devModal class=modal fixed inset-0 z-[60] flex items-center justify-center bg-black80 backdrop-blur-sm
+        div class=bg-slate-800 border border-slate-700 p-8 rounded-2xl max-w-md w-full relative shadow-2xl transform scale-100 transition-transform
+            button onclick=toggleModal() class=absolute top-4 right-4 text-gray-400 hovertext-white text-xl&times;button
+            
+            div class=text-center
+                div class=w-20 h-20 bg-slate-700 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 border-2 border-accent-secondary
+                    👨‍💻
+                div
+                h3 class=text-2xl font-bold text-white mb-1Adnan Shahriah3
+                p class=text-accent-secondary text-xs uppercase tracking-widest mb-6Lead Developer & Researcherp
+                
+                div class=space-y-4 text-left bg-slate-90050 p-6 rounded-xl border border-slate-700
+                    div class=flex items-center justify-between
+                        span class=text-gray-400Telegramspan
+                        a href=httpst.meadnanshahria target=_blank class=text-accent-primary hoverunderline font-mono text-sm@adnanshahriaa
+                    div
+                    div class=flex items-center justify-between
+                        span class=text-gray-400Rolespan
+                        span class=text-white text-smFull Stack Developerspan
+                    div
+                    div class=flex items-center justify-between
+                        span class=text-gray-400Focusspan
+                        span class=text-white text-smCognitive Science UIspan
+                    div
+                div
+                
+                button onclick=toggleModal() class=mt-6 w-full bg-slate-700 hoverbg-slate-600 text-white py-2 rounded-lg text-sm font-medium transition
+                    Close
+                button
+            div
+        div
+    div
+
+    !-- Hero Section --
+    section id=hero class=relative pt-32 pb-20 overflow-hidden
+        !-- Background Gradients --
+        div class=absolute top-0 left-14 w-96 h-96 bg-accent-primary10 rounded-full blur-[100px] pointer-events-nonediv
+        div class=absolute bottom-0 right-14 w-96 h-96 bg-accent-secondary10 rounded-full blur-[100px] pointer-events-nonediv
+
+        div class=max-w-5xl mx-auto px-4 text-center relative z-10
+            div class=inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-accent-secondary text-xs font-bold uppercase tracking-wider mb-8
+                🚀 For University Students (Eng, Arts, Bus)
+            div
+            
+            h1 class=text-5xl mdtext-7xl font-bold text-white mb-8 leading-tight
+                Attention is the New br
+                span class=text-transparent bg-clip-text bg-gradient-to-r from-accent-primary to-emerald-400Currency of Successspan
+            h1
+            
+            p class=text-lg text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed
+                বাংলাদেশের বিশ্ববিদ্যালয় শিক্ষার্থীদের জন্য বিশেষভাবে ডিজাইন করা একটি Cognitive Framework। br
+                CGPA, থিসিস এবং ক্যারিয়ারের চাপে হারিয়ে যাওয়া ফোকাস ফিরিয়ে আনার বিজ্ঞানসম্মত গাইডলাইন।
+            p
+
+            div class=grid grid-cols-2 mdgrid-cols-4 gap-4 max-w-4xl mx-auto text-left
+                div class=glass p-5 rounded-xl border-t-4 border-accent-primary hover-translate-y-1 transition duration-300
+                    div class=text-2xl mb-2🎓div
+                    div class=font-bold text-whiteAcademicdiv
+                    div class=text-xs text-gray-500CGPA Optimizationdiv
+                div
+                div class=glass p-5 rounded-xl border-t-4 border-accent-secondary hover-translate-y-1 transition duration-300
+                    div class=text-2xl mb-2🧠div
+                    div class=font-bold text-whiteCognitivediv
+                    div class=text-xs text-gray-500Deep Work Statediv
+                div
+                div class=glass p-5 rounded-xl border-t-4 border-blue-500 hover-translate-y-1 transition duration-300
+                    div class=text-2xl mb-2⚡div
+                    div class=font-bold text-whiteEfficiencydiv
+                    div class=text-xs text-gray-5005010 Protocoldiv
+                div
+                div class=glass p-5 rounded-xl border-t-4 border-red-500 hover-translate-y-1 transition duration-300
+                    div class=text-2xl mb-2🛡️div
+                    div class=font-bold text-whiteDetoxdiv
+                    div class=text-xs text-gray-500Dopamine Controldiv
+                div
+            div
+        div
+    section
+
+    !-- Interactive Tools Section --
+    section id=tools class=py-20 bg-slate-900 border-y border-slate-800
+        div class=max-w-7xl mx-auto px-4
+            div class=text-center mb-16
+                h2 class=text-3xl font-bold text-whiteInteractive Focus Labh2
+                p class=text-gray-400 mt-2থিওরি অ্যাপ্লাই করার প্র্যাকটিক্যাল টুলসp
+            div
+
+            div class=grid grid-cols-1 lggrid-cols-3 gap-8
+                !-- Tool 1 Environment Check --
+                div class=glass p-6 rounded-2xl
+                    h3 class=text-xl font-bold text-white mb-4 flex items-center gap-2
+                        span class=text-accent-primaryStep 1span Setup
+                    h3
+                    div class=space-y-3
+                        label class=flex items-center gap-3 p-3 bg-slate-800 rounded-lg cursor-pointer hoverbg-slate-700 transition
+                            input type=checkbox class=accent-accent-primary w-5 h-5
+                            span class=text-sm text-gray-300ফোন 'Do Not Disturb' মোডে (Digital Quarantine)span
+                        label
+                        label class=flex items-center gap-3 p-3 bg-slate-800 rounded-lg cursor-pointer hoverbg-slate-700 transition
+                            input type=checkbox class=accent-accent-primary w-5 h-5
+                            span class=text-sm text-gray-300টেবিলের বিশৃঙ্খলা পরিষ্কার (Visual Declutter)span
+                        label
+                        label class=flex items-center gap-3 p-3 bg-slate-800 rounded-lg cursor-pointer hoverbg-slate-700 transition
+                            input type=checkbox class=accent-accent-primary w-5 h-5
+                            span class=text-sm text-gray-300পানির বোতল সাথে নেওয়া (Hydration)span
+                        label
+                    div
+                div
+
+                !-- Tool 2 The Timer --
+                div class=glass p-8 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden border border-accent-secondary30
+                    div class=absolute inset-0 bg-accent-secondary5 blur-xldiv
+                    h3 class=text-xl font-bold text-white mb-2 relative z-10Deep Work Sessionh3
+                    div class=text-xs text-accent-secondary uppercase tracking-widest mb-6 relative z-10Ultradian Rhythmdiv
+                    
+                    div class=text-6xl font-mono font-bold text-white mb-8 relative z-10 id=timerDisplay5000div
+                    
+                    div class=flex gap-4 relative z-10
+                        button onclick=startTimer() id=startBtn class=bg-accent-primary hoverbg-emerald-600 text-white px-6 py-2 rounded-lg font-bold transitionStart Focusbutton
+                        button onclick=resetTimer() class=bg-slate-700 hoverbg-slate-600 text-white px-6 py-2 rounded-lg font-bold transitionResetbutton
+                    div
+                div
+
+                !-- Tool 3 Brain Dump --
+                div class=glass p-6 rounded-2xl
+                    h3 class=text-xl font-bold text-white mb-4 flex items-center gap-2
+                        span class=text-accent-primaryStep 3span Cognitive Offloading
+                    h3
+                    p class=text-xs text-gray-400 mb-2মাথায় ঘুরতে থাকা চিন্তাগুলো এখানে লিখুন এবং ভুলে যান।p
+                    textarea class=w-full h-40 bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focusoutline-none focusborder-accent-primary transition placeholder=Example অ্যাসাইনমেন্ট ডেডলাইন কালকে, বাজারে যেতে হবে...textarea
+                div
+            div
+        div
+    section
+
+    !-- FULL RESEARCH PAPER SECTION --
+    section id=paper class=py-24 bg-bg-main
+        div class=max-w-4xl mx-auto px-4 mdpx-8
+            
+            div class=flex items-center justify-between mb-12 pb-4 border-b border-slate-800
+                h2 class=text-2xl font-bold text-white flex items-center gap-2
+                    span class=text-3xl📄span Research Paper View
+                h2
+                span class=text-xs text-gray-500 font-monoWord Count 1,850  Est. Read 12 minspan
+            div
+
+            !-- The Paper Document Container --
+            article class=bg-[#121212] p-8 mdp-16 rounded-sm shadow-2xl border border-slate-800 paper-content
+                
+                !-- Header Info --
+                div class=text-center mb-16
+                    h1 class=text-3xl mdtext-4xl font-black text-white mb-6 leading-tight
+                        বাংলাদেশের প্রেক্ষাপটে বিশ্ববিদ্যালয় শিক্ষার্থীদের মনোযোগ বৃদ্ধি ও একাডেমিক কর্মদক্ষতা উন্নয়নে 'Deep Focus Protocol'-এর প্রয়োগ এবং মনস্তাত্ত্বিক বিশ্লেষণ
+                    h1
+                    div class=text-sm text-gray-400 space-y-1
+                        pspan class=text-accent-primaryDatespan December 05, 2025p
+                        pspan class=text-accent-primaryTarget Groupspan University Students (Engineering, Business, Humanities)p
+                        pspan class=text-accent-primaryFieldspan Behavioral Psychology & Cognitive Sciencep
+                    div
+                div
+
+                !-- Abstract --
+                div class=mb-12
+                    h3 class=paper-heading uppercase tracking-widest text-lg১. সারসংক্ষেপ (Abstract)h3
+                    p class=text-justify mb-4
+                        এই গবেষণাপত্রের মূল উদ্দেশ্য হলো বাংলাদেশের বিশ্ববিদ্যালয় শিক্ষার্থীদের (University Students) মধ্যে ক্রমবর্ধমান মনোযোগের ঘাটতি (Attention Deficit) এবং ডিজিটাল আসক্তি (Digital Addiction) মোকাবিলার জন্য একটি বিজ্ঞানসম্মত ও প্র্যাকটিক্যাল ফ্রেমওয়ার্ক বা 'প্রটোকল' উপস্থাপন করা। আধুনিক সেমিস্টার সিস্টেমের উচ্চচাপ, ঘনবসতিপূর্ণ 'মেস লাইফ' (Mess Life), এবং সোশ্যাল মিডিয়ার সহজলভ্যতা শিক্ষার্থীদের একাডেমিক পারফরম্যান্স বা CGPA-এর ওপর নেতিবাচক প্রভাব ফেলছে। 
+                    p
+                    p class=text-justify
+                        প্রস্তাবিত Deep Focus Protocol-টি মূলত Neuroscience এবং Behavioral Psychology-এর সমন্বয়ে তৈরি, যা তিনটি ধাপে বিভক্ত প্রস্তুতি (Preparation), কর্মক্ষমতা (Performance), এবং সংরক্ষণ (Preservation)। এই গবেষণায় দেখানো হয়েছে যে, শুধুমাত্র 'Willpower' বা ইচ্ছাশক্তির ওপর নির্ভর না করে, যদি একটি সুনির্দিষ্ট সিস্টেম বা রুটিন মেনে চলা যায়, তবে একজন শিক্ষার্থীর 'Effective Study Hour' এবং তথ্য মনে রাখার ক্ষমতা (Retention Rate) উল্লেখযোগ্যভাবে বৃদ্ধি পায়। বাংলাদেশের আবহাওয়া, খাদ্যাভ্যাস এবং পারিবারিক কাঠামোর সাথে সামঞ্জস্য রেখে এই প্রটোকলটিতে CBT (Cognitive Behavioral Therapy) এবং ACT (Acceptance and Commitment Therapy)-এর ব্যবহারিক দিকগুলো বিশ্লেষণ করা হয়েছে।
+                    p
+                div
+
+                !-- Introduction --
+                div class=mb-12
+                    h3 class=paper-heading uppercase tracking-widest text-lg২. ভূমিকা ও সমস্যার প্রেক্ষাপট (Introduction)h3
+                    p class=mb-4
+                        বাংলাদেশের প্রেক্ষাপটে একজন শিক্ষার্থীর মনোযোগ ধরে রাখার চ্যালেঞ্জগুলো উন্নত বিশ্বের (যেমন ইউরোপ বা আমেরিকা) চেয়ে সম্পূর্ণ ভিন্ন। আমাদের এখানে একজন সাধারণ শিক্ষার্থীকে শুধুমাত্র তার সিলেবাস নিয়ে চিন্তা করতে হয় না; তাকে একই সাথে পারিপার্শ্বিক নয়েজ, যাতায়াত ব্যবস্থা (Traffic), এবং পারিবারিক প্রত্যাশার চাপের সাথে যুদ্ধ করতে হয়।
+                    p
+                    
+                    h4 class=paper-subheading২.১ প্রধান সমস্যাসমূহ (Core Challenges)h4
+                    ul class=list-disc list-inside space-y-2 mb-4 pl-4 text-gray-400
+                        listrongপরিবেশগত নয়েজ (Environmental Noise)strong অধিকাংশ শিক্ষার্থী মেস বা হলের শেয়ার্ড রুমে থাকে। সেখানে নিরবচ্ছিন্ন এবং শান্ত পড়ার পরিবেশ পাওয়া প্রায় অসম্ভব।li
+                        listrongউচ্চ একাডেমিক চাপ (Academic Burnout)strong সেমিস্টার সিস্টেমের কারণে প্রতি সপ্তাহে কুইজ, ল্যাব রিপোর্ট, প্রেজেন্টেশন এবং মিড-টার্মের চাপ থাকে। এই ধকল সামলাতে গিয়ে শিক্ষার্থীরা প্রায়ই 'Cognitive Overload'-এ ভোগে।li
+                        listrongডিজিটাল আসক্তি ও ডোপামিন লুপ (The Dopamine Loop)strong সস্তা ইন্টারনেট এবং স্মার্টফোনের সহজলভ্যতা শিক্ষার্থীদের শর্ট-ফর্ম কন্টেন্ট (ReelsShorts)-এর প্রতি আসক্ত করে তুলেছে। এটি মস্তিষ্কের 'Reward System'-কে হাইজ্যাক করে, ফলে দীর্ঘক্ষণ বইয়ের পাতায় মনোযোগ ধরে রাখা কঠিন হয়ে পড়ে।li
+                    ul
+                    p
+                        এই গবেষণার হাইপোথিসিস হলো—শিক্ষার্থীদের এই সমস্যাগুলো কোনো ব্যক্তিগত ব্যর্থতা নয়, বরং এটি একটি 'System Failure'। তাই সমাধান হিসেবে মোটিভেশনের বদলে একটি সঠিক 'Work Flow' বা প্রটোকল প্রয়োজন।
+                    p
+                div
+
+                !-- Methodology --
+                div class=mb-12
+                    h3 class=paper-heading uppercase tracking-widest text-lg৩. মেথডলজি দ্য থ্রি-ফেজ প্রটোকলh3
+                    p class=mb-6
+                        এই প্রটোকলটি মানুষের মস্তিষ্কের Prefrontal Cortex-কে অপটিমাইজ করার জন্য ডিজাইন করা। একে তিনটি সুনির্দিষ্ট ধাপে ভাগ করা হয়েছে।
+                    p
+
+                    h4 class=paper-subheading❖ ফেজ ১ প্রস্তুতি পর্ব (The Preparation Phase)h4
+                    p class=mb-4
+                        পড়াশোনা শুরু করার আগের ১০-১৫ মিনিট হলো Warming Up। বাংলাদেশের হিউমিড ওয়েদার এবং খাদ্যাভ্যাসের কথা মাথায় রেখে এই ধাপটি সাজানো হয়েছে।
+                    p
+                    div class=pl-4 border-l-2 border-accent-primary mb-6
+                        p class=font-bold text-white mb-1১. এনভায়রনমেন্টাল ডিজাইন (Choice Architecture)p
+                        p class=text-sm mb-2বাংলাদেশের স্টুডেন্টদের পড়ার টেবিলে সাধারণত বইয়ের স্তূপ থাকে। গবেষণায় দেখা গেছে, ভিজ্যুয়াল ক্লাট্টার (Visual Clutter) মস্তিষ্কের প্রসেসিং পাওয়ার কমিয়ে দেয়। টেবিল থেকে অপ্রয়োজনীয় সব বই সরিয়ে ফেলা এবং ফোনটি অন্য রুমে রাখা বাধ্যতামূলক।p
+                        
+                        p class=font-bold text-white mb-1২. সাইকোলজিক্যাল প্রাইমিং (Psychological Priming)p
+                        p class=text-smপড়ার শুরুতে ৫০০ এম.এল পানি পান করা আবশ্যক (Hydration)। এছাড়াও Brain Dump পদ্ধতির মাধ্যমে মাথার সব এলোমেলো চিন্তা কাগজে লিখে ব্রেইনকে Empty করা হয়।p
+                    div
+
+                    h4 class=paper-subheading❖ ফেজ ২ পারফর্মেন্স পর্ব (The Performance Phase)h4
+                    p class=mb-4
+                        এটি হলো মূল পড়ার সময় বা Deep Work Session। এখানে লক্ষ্য হলো 'Flow State' অর্জন করা।
+                    p
+                    ul class=list-disc list-inside space-y-4 pl-4 text-gray-400 mb-6
+                        li
+                            strong class=text-gray-200টাইম বক্সিং (Time Boxing with Ultradian Rhythm)strong
+                            টানা পড়ার চেয়ে ৯০ মিনিটের সাইকেলে পড়া বেশি কার্যকর। তবে শিক্ষার্থীদের মানসিক ধৈর্যের কথা বিবেচনা করে আমরা strong class=text-accent-secondary৫০১০ রুলstrong (৫০ মিনিট পড়া, ১০ মিনিট ব্রেক) সাজেস্ট করি। এই ৫০ মিনিটে পৃথিবীর কারো সাথে যোগাযোগ করা যাবে না।
+                        li
+                        li
+                            strong class=text-gray-200কগনিটিভ ডিফিউশন (Cognitive Defusion - ACT)strong
+                            পড়ার সময় নেগেটিভ চিন্তা (আমার অ্যাসাইনমেন্ট শেষ হবে না, আমার সিজিপিএ কমে যাচ্ছে) আসলে সেগুলোর সাথে যুদ্ধ না করে নিজেকে আলাদা করা। নিজেকে বলা, আমি লক্ষ্য করছি যে আমার মাথায় একটা ভয়ের চিন্তা আসছে। এটি এনজাইটি কমায়।
+                        li
+                        li
+                            strong class=text-gray-200অ্যাক্টিভ রিকল (Active Recall)strong
+                            প্যাসিভলি রিডিং পড়ার বদলে বই বন্ধ করে নিজেকে প্রশ্ন করা। এটি নিউরনের কানেকশন শক্তিশালী করে।
+                        li
+                    ul
+
+                    h4 class=paper-subheading❖ ফেজ ৩ সংরক্ষণ ও সমাপ্তি (Preservation Phase)h4
+                    p class=mb-4
+                        পড়া শেষ করার পর সেটি মস্তিষ্কে সেভ বা Consolidate করা।
+                    p
+                    div class=bg-slate-90050 p-6 rounded border border-slate-800
+                        p class=mb-2strong১. শাটডাউন রিচুয়াল (Shutdown Ritual)strong পড়া শেষ করেই ফোন হাতে না নেওয়া। ঘুমানোর আগে পড়া রিভাইজ দেওয়া এবং আগামীকালের টপিক সেট করা। এটি মস্তিষ্কে 'Zeigarnik Effect' কমায়।p
+                        pstrong২. স্লিপ হাইজিন (Sleep Hygiene)strong বাংলাদেশে রাত জেগে পড়ার প্রবণতা বেশি। কিন্তু নিউরোসায়েন্স বলে, রাত ২টার পর পড়া মেমোরিতে কনসলিডেট হতে সমস্যা হয়। তাই রাত ১২-১টার মধ্যে ঘুমানো জরুরি।p
+                    div
+                div
+
+                !-- Analysis --
+                div class=mb-12
+                    h3 class=paper-heading uppercase tracking-widest text-lg৪. স্ট্রেস ম্যানেজমেন্ট ও ডিস্ট্রাকশন কন্ট্রোলh3
+                    p class=mb-4
+                        বাংলাদেশের শিক্ষার্থীদের জন্য ইমোশন রেগুলেশন অত্যন্ত জরুরি। এখানে DBT (Dialectical Behavior Therapy)-এর দুটি টুল ব্যবহার করা হয়
+                    p
+                    
+                    div class=overflow-x-auto
+                        table class=w-full text-left border-collapse border border-slate-700 mt-4 mb-6
+                            thead
+                                tr class=bg-slate-800
+                                    th class=p-3 border border-slate-700 text-whiteটুল (Tool)th
+                                    th class=p-3 border border-slate-700 text-whiteসমস্যা (Problem)th
+                                    th class=p-3 border border-slate-700 text-whiteসমাধান ও প্রয়োগ (Application)th
+                                tr
+                            thead
+                            tbody class=text-sm
+                                tr
+                                    td class=p-3 border border-slate-700 font-bold text-accent-secondarySTOP Techniquetd
+                                    td class=p-3 border border-slate-700ইম্পালসিভ বিহেভিয়ার (হঠাৎ ফোন টেপা)td
+                                    td class=p-3 border border-slate-700থামুন  শ্বাস নিন  ভাবুন  তারপর সিদ্ধান্ত নিন। এটি ব্রেইনের অটো-পাইলট মোড বন্ধ করে।td
+                                tr
+                                tr
+                                    td class=p-3 border border-slate-700 font-bold text-blue-400ACCEPTStd
+                                    td class=p-3 border border-slate-700হাই স্ট্রেস  এক্সাম প্যানিকtd
+                                    td class=p-3 border border-slate-700Activities (হাঁটাহাঁটি), Sensations (বরফ ধরা)। এটি সাময়িক ইমোশনাল ঝড় থামিয়ে দেয়।td
+                                tr
+                            tbody
+                        table
+                    div
+                    p
+                        strongExplanationstrong স্ট্রেসের সময় আমাদের মস্তিষ্কের Amygdala (ভয়ের কেন্দ্র) হাইজ্যাকড হয়ে যায়। উপরোক্ত টেকনিকগুলো ব্যবহার করলে Amygdala শান্ত হয় এবং Prefrontal Cortex আবার কাজ শুরু করে।
+                    p
+                div
+
+                !-- Results --
+                div class=mb-12
+                    h3 class=paper-heading uppercase tracking-widest text-lg৫. ফলাফল ও কেস স্টাডি (Projected Results)h3
+                    p class=mb-4
+                        ধরা যাক, একজন কাল্পনিক শিক্ষার্থী Student X (Engineering Student, 3rd Year)
+                    p
+                    p class=mb-4
+                        strongপূর্ববতী অবস্থাstrong এলোমেলো রুটিন, পড়ার টেবিলে ফোন, পড়ার মাঝখানে টেনশন, রাত জেগে গেমিং বা সোশ্যাল মিডিয়া। ফলাফল ১০ ঘণ্টা পড়ার টেবিলে থেকেও আউটপুট ২-৩ ঘণ্টা এবং CGPA নিম্নমুখী।
+                    p
+                    p class=mb-6
+                        strongপ্রটোকল প্রয়োগের পর (২১ দিন)strong
+                    p
+                    ul class=list-decimal list-inside space-y-2 pl-4 text-gray-300
+                        liফোন অন্য রুমে রেখে Activation Ritual (ঠান্ডা পানি দিয়ে মুখ ধোয়া) করে পড়া শুরু।li
+                        li৫০ মিনিট পিনপতন ফোকাস (ল্যাব রিপোর্ট বা থিওরি পড়া)।li
+                        liমাঝে নেগেটিভ চিন্তা আসলে Cognitive Defusion অ্যাপ্লাই করা।li
+                        liদিনশেষে Closing Ritual করে ঘুমানো।li
+                    ul
+                    div class=mt-6 p-4 bg-accent-primary10 border border-accent-primary rounded text-center
+                        p class=font-bold text-accent-primaryফলাফলp
+                        p class=text-whiteএফেক্টিভ স্টাডি আওয়ার ৬-৭ ঘণ্টায় উন্নীত, এনজাইটি লেভেল ৫০% হ্রাস এবং সেমিস্টার ফাইনালে উল্লেখযোগ্য উন্নতি।p
+                    div
+                div
+
+                !-- Conclusion --
+                div class=mb-16
+                    h3 class=paper-heading uppercase tracking-widest text-lg৬. উপসংহার (Conclusion)h3
+                    p class=mb-4
+                        এই গবেষণা বা এনালাইসিসের মূল প্রতিপাদ্য হলো—ফোকাস কোনো জাদু নয়, এটি একটি প্র্যাকটিস। বাংলাদেশের শিক্ষার্থীদের আর্থ-সামাজিক প্রেক্ষাপট এবং মানসিক চাপের কথা বিবেচনা করে, এই Deep Focus Protocol টি শুধুমাত্র একটি পড়ার নিয়ম নয় বরং একটি Mental Survival Kit। উইলপাওয়ার বা মোটিভেশনের ওপর নির্ভর না করে, পরিবেশ এবং অভ্যাসের পরিবর্তন (System Design) করলেই দীর্ঘমেয়াদী একাডেমিক এবং প্রফেশনাল সাফল্য সম্ভব।
+                    p
+                div
+
+                !-- Footer References --
+                div class=text-xs text-gray-500 border-t border-slate-800 pt-6
+                    p class=font-bold mb-2 text-gray-400References & Further Readingp
+                    ol class=list-decimal list-inside space-y-1
+                        liNewport, C. (2016). Deep Work Rules for Focused Success in a Distracted World.li
+                        liClear, J. (2018). Atomic Habits An Easy & Proven Way to Build Good Habits.li
+                        liKahneman, D. (2011). Thinking, Fast and Slow (System 1 vs System 2).li
+                        liHarris, R. (2009). ACT Made Simple An Easy-To-Read Primer on Acceptance and Commitment Therapy.li
+                    ol
+                div
+
+            article
+        div
+    section
+
+    !-- Footer --
+    footer class=bg-slate-900 border-t border-slate-800 py-12 text-center
+        div class=max-w-4xl mx-auto px-4
+            p class=text-accent-primary font-bold text-lg mb-2Deep Focus Protocolp
+            p class=text-gray-500 text-sm mb-4Developed for Educational Purpose Only.p
+            p class=text-gray-600 text-xs&copy; 2025 Deep Focus Initiative. All Rights Reserved.p
+        div
+    footer
+
+    !-- JavaScript Logic --
+    script
+         --- Modal Logic ---
+        function toggleModal() {
+            const modal = document.getElementById('devModal');
+            modal.classList.toggle('active');
+        }
+
+         --- Timer Logic ---
+        let timerInterval;
+        let timeLeft = 3000;  50 mins
+        let isRunning = false;
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft  60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${minutes.toString().padStart(2, '0')}${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            const btn = document.getElementById('startBtn');
+            btn.innerText = Running...;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            isRunning = true;
+            timerInterval = setInterval(() = {
+                if (timeLeft  0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    alert(Time's up! Take a 10 min break.);
+                    resetTimer();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = 3000;
+            updateTimerDisplay();
+            const btn = document.getElementById('startBtn');
+            btn.innerText = Start Focus;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    script
+body
+html
