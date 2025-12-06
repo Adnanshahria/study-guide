@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="bn" class="dark">
+<html lang="bn" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>দীপ ফোকাস প্রটোকল | Deep Focus Protocol</title>
+    <meta name="description" content="A science-based focus protocol for students.">
     
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;600;700&family=Noto+Serif+Bengali:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,256 +20,438 @@
                 extend: {
                     colors: {
                         dark: {
+                            950: '#0B0F19', // Deepest BG
                             900: '#111827', // Main BG
                             800: '#1F2937', // Card BG
                             700: '#374151', // Border
-                            TEXT: '#F3F4F6', // Main Text
-                            MUTED: '#9CA3AF' // Muted Text
                         },
                         emerald: {
                             400: '#34D399',
                             500: '#10B981',
                             600: '#059669',
-                            900: '#064E3B'
+                            glow: 'rgba(52, 211, 153, 0.5)'
                         }
                     },
                     fontFamily: {
-                        sans: ['"Noto Sans Bengali"', 'sans-serif'],
-                        serif: ['"Noto Serif Bengali"', 'serif'],
+                        sans: ['"Noto Sans Bengali"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        serif: ['"Noto Serif Bengali"', 'ui-serif', 'Georgia', 'serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
         }
     </script>
     
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* Base Styles */
         body {
             font-family: 'Noto Sans Bengali', sans-serif;
-            background-color: #111827; /* Dark BG */
-            color: #F3F4F6; /* Light Text */
+            background-color: #0B0F19;
+            color: #F3F4F6;
+            overflow-x: hidden;
         }
-        
-        /* PDF Reader Mode Styles */
+
+        /* Black Grid Background Pattern */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(55, 65, 81, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(55, 65, 81, 0.1) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+        }
+
+        .glass-nav {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10B981;
+        }
+
+        /* Typography & PDF Mode */
         .pdf-container {
             font-family: 'Noto Serif Bengali', serif;
-            line-height: 1.8;
-            background-color: #1F2937;
-            color: #E5E7EB;
+            line-height: 1.9;
+            background-color: #1F2937; /* Fallback */
+            background: linear-gradient(145deg, #1F2937, #111827);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .pdf-content h3 {
-            color: #34D399; /* Emerald 400 */
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
+            color: #34D399;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            height: 300px;
+        /* Interactive Elements */
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
         }
 
         .active-tab {
-            background-color: #059669;
-            color: white;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
             border-bottom: 2px solid #34D399;
         }
-
         .inactive-tab {
-            background-color: #1F2937;
             color: #9CA3AF;
-            border-bottom: 1px solid #374151;
+            border-bottom: 2px solid transparent;
         }
-        
         .inactive-tab:hover {
-            background-color: #374151;
-            color: white;
+            color: #D1FAE5;
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        /* Smooth Scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Image Placeholder Style */
-        .img-placeholder {
+        /* Graphic/SVG Placeholders */
+        .svg-illustration-container {
             width: 100%;
             height: 250px;
-            background: linear-gradient(45deg, #1f2937, #111827);
-            border: 1px dashed #4B5563;
+            background: rgba(17, 24, 39, 0.5);
+            border: 1px dashed #374151;
+            border-radius: 0.75rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 0.5rem;
-            margin: 1.5rem 0;
-            color: #9CA3AF;
-            font-size: 0.9rem;
-            text-align: center;
-            padding: 1rem;
+            margin: 2rem 0;
+            transition: border-color 0.3s;
+        }
+        .svg-illustration-container:hover {
+            border-color: #34D399;
+        }
+        .svg-icon {
+            width: 64px;
+            height: 64px;
+            stroke: #4B5563;
+            transition: stroke 0.3s, transform 0.3s;
+        }
+        .svg-illustration-container:hover .svg-icon {
+            stroke: #34D399;
+            transform: scale(1.1);
+        }
+
+        /* Accessibility: Reduce Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased relative min-h-screen">
 
-    <nav class="bg-dark-900 border-b border-dark-700 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Background Grid Overlay -->
+    <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+    <div class="fixed inset-0 bg-gradient-to-t from-dark-950 via-transparent to-transparent pointer-events-none z-0"></div>
+
+    <!-- Navbar -->
+    <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold text-emerald-400">DeepFocus</span>
-                    <span class="ml-2 text-xs bg-emerald-900 text-emerald-200 px-2 py-0.5 rounded-full hidden sm:inline-block border border-emerald-700">Protocol</span>
+                <!-- Logo -->
+                <div class="flex items-center group cursor-default">
+                    <svg class="w-8 h-8 text-emerald-500 mr-2 group-hover:animate-pulse-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span class="text-2xl font-bold text-white tracking-tight">Deep<span class="text-emerald-400">Focus</span></span>
+                    <span class="ml-2 text-[10px] uppercase tracking-wider bg-emerald-900/50 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-500/30 hidden sm:inline-block">Protocol</span>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#problem" class="text-gray-300 hover:text-emerald-400 font-medium transition">সমস্যা</a>
-                    <a href="#protocol" class="text-gray-300 hover:text-emerald-400 font-medium transition">প্রটোকল</a>
-                    <a href="#pdf-reader" class="text-emerald-400 hover:text-emerald-300 font-medium transition flex items-center gap-1">
-                        <span>📖 গাইডবুক</span>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#problem" class="text-gray-300 hover:text-emerald-400 font-medium transition duration-200 text-sm tracking-wide">সমস্যা</a>
+                    <a href="#protocol" class="text-gray-300 hover:text-emerald-400 font-medium transition duration-200 text-sm tracking-wide">প্রটোকল</a>
+                    <a href="#pdf-reader" class="text-emerald-400 hover:text-emerald-300 font-medium transition flex items-center gap-2 group">
+                        <span class="group-hover:scale-110 transition-transform">📖</span> গাইডবুক
                     </a>
+                    <button onclick="scrollToSection('protocol')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_rgba(16,185,129,0.5)] transform hover:-translate-y-0.5">
+                        শুরু করুন
+                    </button>
                 </div>
-                <button onclick="scrollToSection('protocol')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-lg shadow-emerald-900/50">
-                    শুরু করুন
-                </button>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="text-gray-300 hover:text-white focus:outline-none p-2" aria-label="Toggle menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="md:hidden hidden bg-dark-900 border-b border-dark-700 absolute w-full">
+            <div class="px-4 pt-2 pb-6 space-y-2 shadow-xl">
+                <a href="#problem" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-dark-800">সমস্যা</a>
+                <a href="#protocol" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-dark-800">প্রটোকল</a>
+                <a href="#pdf-reader" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-emerald-400 hover:bg-dark-800">📖 গাইডবুক</a>
+                <button onclick="scrollToSection('protocol'); toggleMobileMenu()" class="w-full text-left mt-4 bg-emerald-600 text-white px-4 py-3 rounded-lg font-bold">শুরু করুন</button>
             </div>
         </div>
     </nav>
 
-    <header class="py-12 sm:py-20 border-b border-dark-700 relative overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-emerald-900/10 blur-3xl -z-10"></div>
+    <!-- Hero Section -->
+    <header class="relative py-20 sm:py-32 overflow-hidden z-10">
+        <!-- Glow Effects -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] -z-10"></div>
         
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center z-10">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-6 leading-tight">
-                মনোযোগ কোনো জাদু নয়,<br>এটি একটি <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">বিজ্ঞানসম্মত সিস্টেম</span>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center animate-fade-in-up">
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-white mb-8 leading-tight tracking-tight">
+                মনোযোগ কোনো জাদু নয়,<br>এটি একটি <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 drop-shadow-sm">বিজ্ঞানসম্মত সিস্টেম</span>
             </h1>
-            <p class="text-lg text-gray-400 mb-8 leading-relaxed max-w-2xl mx-auto">
+            <p class="text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl mx-auto">
                 বাংলাদেশের মেডিকেল ও ইউনিভার্সিটি শিক্ষার্থীদের জন্য বিশেষভাবে ডিজাইন করা <strong>'Deep Focus Protocol'</strong>। উইলপাওয়ারের ওপর নির্ভর না করে পরিবেশ এবং অভ্যাসের পরিবর্তনের মাধ্যমে আপনার কর্মদক্ষতা বাড়ান।
             </p>
-            <div class="flex justify-center gap-6 text-gray-400">
-                <div class="flex items-center text-sm"><span class="text-2xl mr-2">🧠</span> কগনিটিভ সায়েন্স</div>
-                <div class="flex items-center text-sm"><span class="text-2xl mr-2">⏱️</span> টাইম বক্সিং</div>
-                <div class="flex items-center text-sm"><span class="text-2xl mr-2">🧬</span> নিউরোসায়েন্স</div>
+            
+            <!-- Features Pills -->
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-8 text-gray-300">
+                <div class="glass-panel px-4 py-2 rounded-full flex items-center text-sm font-medium hover:border-emerald-500/50 transition cursor-default">
+                    <span class="text-xl mr-2">🧠</span> কগনিটিভ সায়েন্স
+                </div>
+                <div class="glass-panel px-4 py-2 rounded-full flex items-center text-sm font-medium hover:border-emerald-500/50 transition cursor-default">
+                    <span class="text-xl mr-2">⏱️</span> টাইম বক্সিং
+                </div>
+                <div class="glass-panel px-4 py-2 rounded-full flex items-center text-sm font-medium hover:border-emerald-500/50 transition cursor-default">
+                    <span class="text-xl mr-2">🧬</span> নিউরোসায়েন্স
+                </div>
             </div>
         </div>
     </header>
 
-    <section id="problem" class="py-16 bg-dark-900">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-white mb-4 border-l-4 border-emerald-500 pl-4">কেন আমরা ফোকাস করতে পারি না?</h2>
-                    <p class="text-gray-400 mb-6 leading-relaxed">
-                        বাংলাদেশের প্রেক্ষাপটে একজন শিক্ষার্থীর প্রধান শত্রু হলো পরিবেশগত নয়েজ এবং ডিজিটাল আসক্তি। আমরা টেবিলে ১০-১২ ঘণ্টা বসে থাকি, কিন্তু আউটপুট আসে মাত্র ২-৩ ঘণ্টা। একে বলা হয় <strong>"Pseudo-Work"</strong>।
-                    </p>
-                    <ul class="space-y-3 mb-6 text-gray-300">
-                        <li class="flex items-start"><span class="text-red-400 mr-2">✖</span> মাল্টিটাস্কিং এবং ব্রেইন ফগ</li>
-                        <li class="flex items-start"><span class="text-red-400 mr-2">✖</span> রাত জেগে সোশ্যাল মিডিয়া স্ক্রলিং</li>
-                        <li class="flex items-start"><span class="text-red-400 mr-2">✖</span> অগোছালো পড়ার টেবিল</li>
-                    </ul>
-                </div>
-                <div class="bg-dark-800 p-6 rounded-xl border border-dark-700 shadow-xl">
-                    <h3 class="text-lg font-semibold text-center text-gray-200 mb-4">গড় স্টাডি সেশনের বাস্তবতা</h3>
-                    <div class="chart-container">
-                        <canvas id="problemChart"></canvas>
+    <!-- Problem Section -->
+    <section id="problem" class="py-20 relative z-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="glass-panel rounded-2xl p-8 sm:p-12 border border-dark-700 shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-6 flex items-center">
+                            <span class="w-1.5 h-8 bg-emerald-500 mr-4 rounded-full"></span>
+                            কেন আমরা ফোকাস করতে পারি না?
+                        </h2>
+                        <p class="text-gray-400 mb-6 leading-relaxed text-lg">
+                            বাংলাদেশের প্রেক্ষাপটে একজন শিক্ষার্থীর প্রধান শত্রু হলো পরিবেশগত নয়েজ এবং ডিজিটাল আসক্তি। আমরা টেবিলে ১০-১২ ঘণ্টা বসে থাকি, কিন্তু আউটপুট আসে মাত্র ২-৩ ঘণ্টা। একে বলা হয় <strong class="text-emerald-400">"Pseudo-Work"</strong>।
+                        </p>
+                        <ul class="space-y-4 mb-6 text-gray-300">
+                            <li class="flex items-center bg-dark-900/50 p-3 rounded-lg border border-dark-700/50">
+                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold mr-3">✖</span> মাল্টিটাস্কিং এবং ব্রেইন ফগ
+                            </li>
+                            <li class="flex items-center bg-dark-900/50 p-3 rounded-lg border border-dark-700/50">
+                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold mr-3">✖</span> রাত জেগে সোশ্যাল মিডিয়া স্ক্রলিং
+                            </li>
+                            <li class="flex items-center bg-dark-900/50 p-3 rounded-lg border border-dark-700/50">
+                                <span class="flex items-center justify-center w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-xs font-bold mr-3">✖</span> অগোছালো পড়ার টেবিল
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-dark-900/80 p-6 rounded-xl border border-dark-700 shadow-inner">
+                        <h3 class="text-lg font-semibold text-center text-gray-200 mb-6">গড় স্টাডি সেশনের বাস্তবতা</h3>
+                        <div class="relative w-full h-[300px]">
+                            <canvas id="problemChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="protocol" class="py-16 bg-dark-800">
+    <!-- Protocol Section (Tabs) -->
+    <section id="protocol" class="py-20 z-10 relative">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-white mb-4">দ্য থ্রি-ফেজ প্রটোকল</h2>
-                <p class="text-gray-400 max-w-2xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="text-emerald-400 font-semibold tracking-wider text-sm uppercase mb-2 block">The Methodology</span>
+                <h2 class="text-4xl font-bold text-white mb-4">দ্য থ্রি-ফেজ প্রটোকল</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg">
                     মস্তিষ্কের Prefrontal Cortex-কে অপটিমাইজ করার জন্য এই প্রটোকলকে তিনটি ধাপে ভাগ করা হয়েছে।
                 </p>
             </div>
 
-            <div class="bg-dark-900 rounded-2xl shadow-2xl border border-dark-700 overflow-hidden">
-                <div class="flex flex-wrap border-b border-dark-700">
-                    <button onclick="switchTab('prep')" id="tab-prep" class="flex-1 py-4 px-6 font-semibold text-lg active-tab transition-all">১. প্রস্তুতি</button>
-                    <button onclick="switchTab('perf')" id="tab-perf" class="flex-1 py-4 px-6 font-semibold text-lg inactive-tab transition-all">২. কর্মক্ষমতা</button>
-                    <button onclick="switchTab('pres')" id="tab-pres" class="flex-1 py-4 px-6 font-semibold text-lg inactive-tab transition-all">৩. সংরক্ষণ</button>
+            <div class="glass-panel rounded-2xl shadow-2xl overflow-hidden border border-emerald-900/30 ring-1 ring-white/5">
+                <!-- Tab Navigation -->
+                <div class="flex flex-col sm:flex-row border-b border-dark-700/50 bg-dark-900/50">
+                    <button onclick="switchTab('prep')" id="tab-prep" class="flex-1 py-5 px-6 font-semibold text-lg active-tab transition-all flex justify-center items-center gap-2 group focus:outline-none">
+                        <span class="bg-dark-800 rounded px-2 py-0.5 text-sm group-hover:bg-dark-700 transition">০১</span> প্রস্তুতি
+                    </button>
+                    <button onclick="switchTab('perf')" id="tab-perf" class="flex-1 py-5 px-6 font-semibold text-lg inactive-tab transition-all flex justify-center items-center gap-2 group focus:outline-none">
+                        <span class="bg-dark-800 rounded px-2 py-0.5 text-sm group-hover:bg-dark-700 transition">০২</span> কর্মক্ষমতা
+                    </button>
+                    <button onclick="switchTab('pres')" id="tab-pres" class="flex-1 py-5 px-6 font-semibold text-lg inactive-tab transition-all flex justify-center items-center gap-2 group focus:outline-none">
+                        <span class="bg-dark-800 rounded px-2 py-0.5 text-sm group-hover:bg-dark-700 transition">০৩</span> সংরক্ষণ
+                    </button>
                 </div>
 
-                <div id="content-prep" class="p-8 block">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald-400 mb-3">ওয়ার্ম-আপ সেশন (১০-১৫ মিনিট)</h3>
-                            <div class="bg-emerald-900/20 p-5 rounded-lg border border-emerald-900/50 mb-6">
-                                <h4 class="font-semibold text-emerald-400 mb-3">Environment Checklist</h4>
-                                <div class="space-y-2 text-gray-300">
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-700 border-dark-600">
-                                        <span>টেবিল ভিজ্যুয়াল ক্লাটার মুক্ত (Clean Desk)</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-700 border-dark-600">
-                                        <span>৫০০ এম.এল পানি পান করেছি</span>
-                                    </label>
-                                    <label class="flex items-center space-x-3 cursor-pointer">
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-700 border-dark-600">
-                                        <span>ফোন সাইলেন্ট/Do Not Disturb মোড</span>
-                                    </label>
+                <!-- Content Area -->
+                <div class="relative min-h-[500px]">
+                    
+                    <!-- Tab 1: Preparation -->
+                    <div id="content-prep" class="p-8 sm:p-10 block animate-fade-in-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            <div>
+                                <h3 class="text-2xl font-bold text-emerald-400 mb-6 flex items-center">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                    ওয়ার্ম-আপ সেশন (১০-১৫ মিনিট)
+                                </h3>
+                                <div class="bg-emerald-900/10 p-6 rounded-xl border border-emerald-500/20 mb-6 backdrop-blur-sm">
+                                    <h4 class="font-semibold text-emerald-300 mb-4 uppercase text-xs tracking-wider">Environment Checklist</h4>
+                                    <div class="space-y-3 text-gray-300">
+                                        <label class="flex items-center space-x-3 cursor-pointer group p-2 hover:bg-emerald-900/20 rounded transition">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-800 border-dark-600 focus:ring-emerald-500 focus:ring-offset-0">
+                                            <span class="group-hover:text-emerald-100 transition">টেবিল ভিজ্যুয়াল ক্লাটার মুক্ত (Clean Desk)</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3 cursor-pointer group p-2 hover:bg-emerald-900/20 rounded transition">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-800 border-dark-600 focus:ring-emerald-500 focus:ring-offset-0">
+                                            <span class="group-hover:text-emerald-100 transition">৫০০ এম.এল পানি পান করেছি</span>
+                                        </label>
+                                        <label class="flex items-center space-x-3 cursor-pointer group p-2 hover:bg-emerald-900/20 rounded transition">
+                                            <input type="checkbox" class="form-checkbox h-5 w-5 text-emerald-500 rounded bg-dark-800 border-dark-600 focus:ring-emerald-500 focus:ring-offset-0">
+                                            <span class="group-hover:text-emerald-100 transition">ফোন সাইলেন্ট/Do Not Disturb মোড</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-dark-800/80 p-8 rounded-xl border border-dark-700 shadow-inner">
+                                <h3 class="text-xl font-bold text-gray-200 mb-4 flex items-center justify-between">
+                                    ব্রেইন ডাম্প (Brain Dump)
+                                    <span class="text-xs font-normal text-gray-500 bg-dark-900 px-2 py-1 rounded">Mental RAM Clear</span>
+                                </h3>
+                                <textarea id="brainDumpArea" class="w-full h-40 p-4 bg-dark-950 border border-dark-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-gray-300 resize-none transition-colors" placeholder="মাথার সব চিন্তা এখানে লিখুন... (e.g., বাজার করতে হবে, ফ্রেন্ডকে কল দিতে হবে)"></textarea>
+                                <button onclick="clearBrainDump()" class="mt-4 w-full bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-white py-3 rounded-lg font-semibold shadow-lg transition-all transform active:scale-95">Clear Mind & Focus</button>
+                                <p id="dumpMessage" class="text-center text-emerald-400 text-sm mt-3 font-medium opacity-0 transition-opacity flex justify-center items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> মন এখন প্রস্তুত!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Performance -->
+                    <div id="content-perf" class="p-8 sm:p-10 hidden animate-fade-in-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-emerald-400 mb-6 flex items-center">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    ডিপ ওয়ার্ক সেশন (৫০/১০ রুল)
+                                </h3>
+                                <ul class="space-y-4 mb-6 text-gray-300">
+                                    <li class="bg-dark-800/50 p-5 rounded-lg border border-dark-700 flex gap-4 items-start hover:border-emerald-500/30 transition">
+                                        <div class="bg-emerald-900/30 p-2 rounded text-emerald-400">01</div>
+                                        <div>
+                                            <strong class="text-emerald-400 block mb-1">অ্যাক্টিভেশন</strong>
+                                            <span class="text-sm text-gray-400">অজু করা বা চোখেমুখে ঠান্ডা পানি দেওয়া। এটি মেম্যালিয়ান ডাইভ রিফ্লেক্স ট্রিগার করে।</span>
+                                        </div>
+                                    </li>
+                                    <li class="bg-dark-800/50 p-5 rounded-lg border border-dark-700 flex gap-4 items-start hover:border-emerald-500/30 transition">
+                                        <div class="bg-emerald-900/30 p-2 rounded text-emerald-400">02</div>
+                                        <div>
+                                            <strong class="text-emerald-400 block mb-1">ফোকাস ব্লক</strong>
+                                            <span class="text-sm text-gray-400">৫০ মিনিট টানা পড়া (No Phone)। ফোনটি অন্য রুমে রাখুন।</span>
+                                        </div>
+                                    </li>
+                                    <li class="bg-dark-800/50 p-5 rounded-lg border border-dark-700 flex gap-4 items-start hover:border-emerald-500/30 transition">
+                                        <div class="bg-emerald-900/30 p-2 rounded text-emerald-400">03</div>
+                                        <div>
+                                            <strong class="text-emerald-400 block mb-1">ব্রেক</strong>
+                                            <span class="text-sm text-gray-400">১০ মিনিট (চোখ বন্ধ রাখুন বা হাঁটুন, স্ক্রিন দেখবেন না)।</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Timer Card -->
+                            <div class="bg-dark-800 p-10 rounded-2xl text-center shadow-2xl border border-dark-600 relative overflow-hidden group">
+                                <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/10 to-transparent pointer-events-none"></div>
+                                <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 shadow-[0_0_10px_#10B981]"></div>
+                                
+                                <h4 class="text-lg font-medium text-gray-400 mb-8 tracking-widest uppercase text-xs">আল্ট্রাডিয়ান টাইমার</h4>
+                                <div class="relative inline-block mb-10">
+                                    <div class="text-7xl sm:text-8xl font-mono font-bold text-white tracking-wider tabular-nums z-10 relative drop-shadow-xl" id="timerDisplay">50:00</div>
+                                    <!-- Decoration -->
+                                    <div class="absolute -inset-4 bg-emerald-500/5 blur-xl rounded-full"></div>
+                                </div>
+                                
+                                <div class="flex justify-center space-x-4">
+                                    <button onclick="startTimer()" id="startBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg font-bold transition btn-hover-effect shadow-lg shadow-emerald-900/50 w-32">শুরু</button>
+                                    <button onclick="resetTimer()" class="bg-dark-700 hover:bg-dark-600 text-gray-300 hover:text-white px-8 py-3 rounded-lg font-bold transition border border-dark-600 w-32">রিসেট</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
-                            <h3 class="text-lg font-bold text-gray-200 mb-2">ব্রেইন ডাম্প (Brain Dump)</h3>
-                            <textarea id="brainDumpArea" class="w-full h-32 p-3 bg-dark-900 border border-dark-700 rounded-md focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-gray-300" placeholder="মাথার সব চিন্তা এখানে লিখুন..."></textarea>
-                            <button onclick="clearBrainDump()" class="mt-3 w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2 rounded transition">Clear Mind</button>
-                            <p id="dumpMessage" class="text-center text-emerald-400 text-sm mt-2 font-medium opacity-0 transition-opacity">মন এখন প্রস্তুত!</p>
-                        </div>
                     </div>
-                </div>
 
-                <div id="content-perf" class="p-8 hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald-400 mb-3">ডিপ ওয়ার্ক সেশন (৫০/১০ রুল)</h3>
-                            <ul class="space-y-4 mb-6 text-gray-300">
-                                <li class="bg-dark-800 p-4 rounded border border-dark-700">
-                                    <strong class="text-emerald-400">অ্যাক্টিভেশন:</strong> অজু করা বা চোখেমুখে ঠান্ডা পানি দেওয়া।
-                                </li>
-                                <li class="bg-dark-800 p-4 rounded border border-dark-700">
-                                    <strong class="text-emerald-400">ফোকাস ব্লক:</strong> ৫০ মিনিট টানা পড়া (No Phone)।
-                                </li>
-                                <li class="bg-dark-800 p-4 rounded border border-dark-700">
-                                    <strong class="text-emerald-400">ব্রেক:</strong> ১০ মিনিট (চোখ বন্ধ রাখুন বা হাঁটুন, স্ক্রিন দেখবেন না)।
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="bg-dark-800 p-8 rounded-xl text-center shadow-lg border border-dark-700 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
-                            <h4 class="text-lg font-medium text-gray-400 mb-6">আল্ট্রাডিয়ান টাইমার</h4>
-                            <div class="text-6xl font-mono font-bold text-white mb-8" id="timerDisplay">50:00</div>
-                            <div class="flex justify-center space-x-4">
-                                <button onclick="startTimer()" id="startBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded font-medium transition">শুরু</button>
-                                <button onclick="resetTimer()" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded font-medium transition">রিসেট</button>
+                    <!-- Tab 3: Preservation -->
+                    <div id="content-pres" class="p-8 sm:p-10 hidden animate-fade-in-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-emerald-400 mb-6 flex items-center">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                    শাটডাউন রিচুয়াল
+                                </h3>
+                                <p class="text-gray-400 mb-6 text-lg">পড়া মেমোরিতে সেভ হওয়ার জন্য ঘুম অপরিহার্য। রাত ২টার পর পড়া মেমোরিতে থাকে না, বরং ব্রেইন টক্সিন জমা হয়।</p>
+                                
+                                <div class="bg-gradient-to-br from-indigo-900/30 to-dark-800 p-6 rounded-xl border border-indigo-500/20 shadow-lg">
+                                    <h4 class="font-semibold text-indigo-400 mb-4 flex items-center">
+                                        <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2 animate-pulse"></span>
+                                        Closing Ritual Protocol
+                                    </h4>
+                                    <ul class="space-y-3 text-gray-300">
+                                        <li class="flex items-start">
+                                            <svg class="w-5 h-5 text-indigo-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            আগামীকালের টপিক সেট করুন (ডিসিশন ফ্যাটিগ কমানোর জন্য)।
+                                        </li>
+                                        <li class="flex items-start">
+                                            <svg class="w-5 h-5 text-indigo-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            কৃতজ্ঞতা স্বীকার করুন (Gratitude reduces cortisol)।
+                                        </li>
+                                        <li class="flex items-start">
+                                            <svg class="w-5 h-5 text-indigo-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            রাত ১২:০০ - ১:০০ টার মধ্যে ঘুমান।
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="content-pres" class="p-8 hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                        <div>
-                            <h3 class="text-xl font-bold text-emerald-400 mb-3">শাটডাউন রিচুয়াল</h3>
-                            <p class="text-gray-400 mb-4">পড়া মেমোরিতে সেভ হওয়ার জন্য ঘুম অপরিহার্য। রাত ২টার পর পড়া মেমোরিতে থাকে না।</p>
-                            <div class="bg-indigo-900/20 p-5 rounded-lg border border-indigo-900/50">
-                                <h4 class="font-semibold text-indigo-400 mb-3">Closing Ritual</h4>
-                                <ul class="list-disc list-inside space-y-2 text-gray-300">
-                                    <li>আগামীকালের টপিক সেট করুন।</li>
-                                    <li>কৃতজ্ঞতা স্বীকার করুন (Gratitude)।</li>
-                                    <li>রাত ১২:০০ - ১:০০ টার মধ্যে ঘুমান।</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="bg-dark-800 p-4 rounded-xl border border-dark-700">
-                             <div class="chart-container">
-                                <canvas id="sleepChart"></canvas>
+                            <div class="bg-dark-800/80 p-6 rounded-xl border border-dark-700 shadow-inner">
+                                 <div class="relative w-full h-[300px]">
+                                    <canvas id="sleepChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,239 +460,313 @@
         </div>
     </section>
 
-    <section id="pdf-reader" class="py-20 bg-dark-900 border-t border-dark-700">
+    <!-- PDF Reader Section -->
+    <section id="pdf-reader" class="py-24 bg-dark-950 border-t border-dark-800 relative z-10">
         <div class="max-w-4xl mx-auto px-4">
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2">
-                    <span class="text-4xl">📖</span> গাইডবুক: পূর্ণাঙ্গ প্রটোকল
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <span class="text-4xl filter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">📖</span> গাইডবুক: পূর্ণাঙ্গ প্রটোকল
                 </h2>
-                <span class="text-xs bg-dark-800 text-gray-400 px-3 py-1 rounded border border-dark-700">Read Mode</span>
+                <span class="text-xs bg-dark-800 text-emerald-400 px-3 py-1 rounded border border-dark-700 font-mono">READ_MODE: ACTIVE</span>
             </div>
 
-            <div class="pdf-container p-8 sm:p-12 rounded-lg shadow-2xl border border-dark-700 relative">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-t-lg"></div>
+            <!-- Paper Effect Container -->
+            <article class="pdf-container p-8 sm:p-16 rounded-xl relative overflow-hidden text-lg">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600"></div>
 
-                <div class="pdf-content text-gray-300 text-lg">
+                <div class="pdf-content text-gray-300">
                     
-                    <h1 class="text-3xl font-bold text-white mb-6 border-b border-dark-700 pb-4">১. ইন্ট্রোডাকশন: ক্যাম্পাসে কগনিটিভ ক্রাইসিস ও 'ডিপ ফোকাস'</h1>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-8 border-b border-gray-700 pb-6 leading-tight">১. ইন্ট্রোডাকশন: ক্যাম্পাসে কগনিটিভ ক্রাইসিস ও 'ডিপ ফোকাস'</h1>
                     
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ১.১ একাডেমিক প্রেশারের সাইকোলজিক্যাল প্রেক্ষাপট</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ১.১ একাডেমিক প্রেশারের সাইকোলজিক্যাল প্রেক্ষাপট</h3>
+                    <p class="mb-6 text-gray-300">
                         বাংলাদেশের প্রেক্ষাপটে ইউনিভার্সিটি লাইফ কেবল ক্লাস আর পরীক্ষার মধ্যে সীমাবদ্ধ নয়; এটি একটি মাল্টি-ডাইমেনশনাল স্ট্রাগল। সেশন জট, টিউশনের প্রেশার, পলিটিক্যাল অস্থিরতা, এবং গ্রাজুয়েশনের পর জব মার্কেটের অনিশ্চয়তা স্টুডেন্টদের 'ক্রনিক স্ট্রেস' (Chronic Stress)-এর মধ্যে রাখে। সিজিপিএ মেইনটেইন করা এবং স্কিল ডেভেলপমেন্টের এই ইঁদুর দৌড় বা 'Rat Race' অনেক সময় শিক্ষার্থীদের সিভিয়ার এনজাইটি (Anxiety) এবং বার্নআউটের (Burnout) দিকে ঠেলে দেয়।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Anxiety/Stress -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of academic pressure">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" opacity="0.3"/>
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 1.1: The Chronic Stress Cycle</p>
                     </div>
-                    <p class="mb-4">
+
+                    <p class="mb-6 text-gray-300">
                         ইউনিভার্সিটি কারিকুলামে রিসার্চ পেপার, প্রেজেন্টেশন এবং ক্রিটিক্যাল থিঙ্কিং-এর প্রয়োজন হয়। কিন্তু আমাদের স্কুল-কলেজের 'রোট লার্নিং' বা মুখস্থবিদ্যার অভ্যাস থেকে বেরিয়ে এসে কীভাবে ডিপ অ্যানালাইসিস বা গভীর মনোযোগ দিতে হয়, তা অনেকেই জানে না। সোশ্যাল মিডিয়া এবং স্মার্টফোনের কনস্ট্যান্ট নোটিফিকেশন এই ফোকাস ধরে রাখাকে আরও ইম্পসিবল করে তুলেছে।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ১.২ অবজেক্টিভ ও স্কোপ</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ১.২ অবজেক্টিভ ও স্কোপ</h3>
+                    <p class="mb-8 text-gray-300">
                         এই প্রোটোকলের মেইন গোল হলো একজন বাংলাদেশি ইউনিভার্সিটি স্টুডেন্টের রিয়েল-লাইফ সিনারিও—যেমন হলের গণরুমে থাকা, মেসের নয়েজ, বা ঢাকার ট্রাফিক জ্যামে বসে থাকা—বিবেচনায় নিয়ে 'ডিপ ফোকাস' অ্যাচিভ করার উপায় বের করা। এটি কেবল পড়াশোনার রুটিন নয়; বরং ঘুম, ডায়েট, ইবাদত এবং স্টাডির একটি হলিস্টিক এপ্রোচ বা সামগ্রিক জীবনব্যবস্থা।
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🧠 ২. নিউরোবায়োলজিক্যাল মেকানিজম: অ্যাটেনশনের সায়েন্স</h1>
-                    <p class="mb-4">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🧠 ২. নিউরোবায়োলজিক্যাল মেকানিজম: অ্যাটেনশনের সায়েন্স</h1>
+                    <p class="mb-6 text-gray-300">
                         'ডিপ ফোকাস' কোনো ম্যাজিক নয়, এটি ব্রেইনের একটি স্পেসিফিক বায়োলজিক্যাল স্টেট। ইউনিভার্সিটি স্টুডেন্টদের জন্য এই স্টেটে ঢোকা কেন জরুরি, তা বুঝতে ব্রেইনের মেকানিজম বোঝা দরকার।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ২.১ প্রিফ্রন্টাল কর্টেক্স এবং এক্সিকিউটিভ ফাংশন</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ২.১ প্রিফ্রন্টাল কর্টেক্স এবং এক্সিকিউটিভ ফাংশন</h3>
+                    <p class="mb-6 text-gray-300">
                         আমাদের ব্রেইনের সামনের অংশ বা প্রিফ্রন্টাল কর্টেক্স (Prefrontal Cortex - PFC) হলো আমাদের ব্রেইনের 'CEO'। এর কাজ হলো ডিসিশন নেওয়া, প্ল্যান করা এবং ইমপালস কন্ট্রোল (Impulse Control) বা নিজেকে নিয়ন্ত্রণ করা। যখন আপনি কোনো জটিল থিওরি বুঝছেন বা কোডিং করছেন, তখন এই PFC-কে সবচেয়ে বেশি কাজ করতে হয়।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Brain/Neuron -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of brain focus">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 2.1: Prefrontal Cortex Activation</p>
                     </div>
-                    <p class="mb-4">
+
+                    <p class="mb-6 text-gray-300">
                         নিউরোসায়েন্টিস্টদের মতে, ডিপ ফোকাসের সময় ব্রেইন 'আলফা' (Alpha) এবং 'থীটা' (Theta) ওয়েভ স্টেটে থাকে। এই স্টেটে বাইরের নয়েজ ফিল্টার করার ক্ষমতা বাড়ে। কিন্তু ক্যাম্পাসের কোলাহল বা রুমমেটদের আড্ডা PFC-এর ওপর লোড বাড়ায়, ফলে ব্রেইন দ্রুত টায়ার্ড হয়ে যায়।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ২.২ মায়েলেশন: এক্সপার্ট হওয়ার বায়োলজিক্যাল সূত্র</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ২.২ মায়েলেশন: এক্সপার্ট হওয়ার বায়োলজিক্যাল সূত্র</h3>
+                    <p class="mb-4 text-gray-300">
                         ইউনিভার্সিটিতে কেউ কেউ কেন অন্যদের চেয়ে দ্রুত টপিক ক্যাচ করতে পারে? এর সিক্রেট হলো 'মায়েলিনেশন' (Myelination)। নিউরনের তার বা অ্যাক্সন (Axon)-এর চারপাশে মায়েলিন নামক চর্বির আস্তরণ তৈরি হলে সিগন্যাল ট্রান্সমিশন স্পিড ১০০ গুণ বেড়ে যায়।
                     </p>
-                    <div class="bg-dark-800 p-4 border-l-4 border-emerald-500 my-4 italic">
+                    <div class="bg-dark-900 p-6 border-l-4 border-emerald-500 my-6 italic rounded-r-lg shadow-md">
                         সমীকরণটি সিম্পল: <br>
-                        <span class="text-white font-bold">গভীর মনোযোগ × পুনরাবৃত্তি = মায়েলিনেশন</span>
+                        <span class="text-white font-bold text-xl mt-2 block">গভীর মনোযোগ × পুনরাবৃত্তি = মায়েলিনেশন</span>
                     </div>
-                    <p class="mb-4">
+                    <p class="mb-6 text-gray-300">
                         যখন আপনি ফোকাসড হয়ে বারবার কোডিং প্র্যাকটিস করেন বা ম্যাথ সলভ করেন, তখন ওই নিউরাল পাথওয়ে (Neural Pathway) শক্তিশালী হয়। কিন্তু পড়ার মাঝে ফোন চেক করলে সার্কিট ব্রেক হয় এবং মায়েলেশন ঠিকমতো হয় না।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ২.৩ কনটেক্সট সুইচিং-এর হিডেন কস্ট</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ২.৩ কনটেক্সট সুইচিং-এর হিডেন কস্ট</h3>
+                    <p class="mb-8 text-gray-300">
                         ইউনিভার্সিটি স্টুডেন্টদের বড় ভুল হলো 'মাল্টিটাস্কিং'। অ্যাসাইনমেন্ট করার সময় চ্যাটিং করা বা গান শোনা। গবেষণায় দেখা গেছে, একবার মনোযোগ সরে গেলে আগের গভীরতায় ফিরতে ব্রেইনের প্রায় ২৩ মিনিট সময় লাগে। একে বলা হয় 'অ্যাটেনশন রেসিডু' (Attention Residue)। এর ফলে আপনার 'ফাংশনাল আইকিউ' (Functional IQ) ১০ পয়েন্ট পর্যন্ত কমে যেতে পারে, যা আপনার রিসার্চ বা এক্সামের জন্য ক্ষতিকর।
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🧱 ৩. কগনিটিভ আর্কিটেকচার: স্টাডি ফ্রেমওয়ার্ক</h1>
-                    <p class="mb-4">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🧱 ৩. কগনিটিভ আর্কিটেকচার: স্টাডি ফ্রেমওয়ার্ক</h1>
+                    <p class="mb-6 text-gray-300">
                         থিওরি শেষ, এবার প্র্যাকটিক্যাল মেথডে আসা যাক। ইউনিভার্সিটি লেভেলে ভালো করার জন্য মডার্ন কগনিটিভ সায়েন্সের কিছু প্রুভেন মেথড ফলো করা মাস্ট।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৩.১ প্যাসিভ রিডিং vs অ্যাক্টিভ রিকল</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৩.১ প্যাসিভ রিডিং vs অ্যাক্টিভ রিকল</h3>
+                    <p class="mb-4 text-gray-300">
                         স্লাইড বা বই বারবার রিডিং পড়া হলো 'প্যাসিভ লার্নিং', যা লং-টার্ম মেমোরির জন্য ইফেক্টিভ না। এর বদলে 'অ্যাক্টিভ রিকল' (Active Recall) ব্যবহার করতে হবে।
                     </p>
-                    <ul class="list-disc ml-6 mb-4 space-y-2">
+                    <ul class="list-disc ml-6 mb-6 space-y-2 text-gray-400">
                         <li><strong class="text-white">পদ্ধতি:</strong> লেকচার বা চ্যাপ্টার পড়ার পর বই বন্ধ করে নিজেকে প্রশ্ন করা—"আমি কী শিখলাম?" এবং কোনো হেল্প ছাড়াই ব্রেইন থেকে তথ্য বের করা।</li>
                         <li><strong class="text-white">অ্যাপ্লিকেশন:</strong> এক্সামে যখন ক্রিয়েটিভ বা অ্যানালিটিক্যাল প্রশ্ন আসে, তখন এই মেথড ব্রেইনকে ইনফরমেশন কানেক্ট করতে সাহায্য করে।</li>
                     </ul>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৩.২ স্পেসড রিপিটেশন সিস্টেম (SRS)</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৩.২ স্পেসড রিপিটেশন সিস্টেম (SRS)</h3>
+                    <p class="mb-6 text-gray-300">
                         সেমিস্টার ফাইনালে পুরো সিলেবাস মনে রাখা কঠিন। হারমান এবিংহাউসের 'ফরগেটিং কার্ভ' (Forgetting Curve) বলে, আমরা ২৪ ঘণ্টায় যা পড়ি তার ৮০% ভুলে যাই।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Graph/Curve -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of Forgetting Curve">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 3.1: The Forgetting Curve</p>
                     </div>
-                    <ul class="list-disc ml-6 mb-4 space-y-2">
+
+                    <ul class="list-disc ml-6 mb-6 space-y-2 text-gray-400">
                         <li><strong class="text-white">কৌশল:</strong> আজ যা পড়লেন, তা ১ দিন পর, এরপর ৩ দিন পর, এবং ১ সপ্তাহ পর রিভাইস দেওয়া।</li>
                         <li><strong class="text-white">টুলস:</strong> 'Anki' অ্যাপ বা ফিজিক্যাল ফ্ল্যাশকার্ড ব্যবহার করে কঠিন টার্ম বা ফর্মুলা মনে রাখা। এটি বিসিএস বা জিআরই (GRE) প্রিপারেশনের জন্যও গেম-চেঞ্জার।</li>
                     </ul>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৩.৩ আল্ট্রাডিয়ান রিদম ও ডিপ ওয়ার্ক ব্লক</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ৩.৩ আল্ট্রাডিয়ান রিদম ও ডিপ ওয়ার্ক ব্লক</h3>
+                    <p class="mb-8 text-gray-300">
                         ইউনিভার্সিটির ল্যাব রিপোর্ট বা থিসিস লেখার জন্য ২৫ মিনিটের 'পোমোডোরো' সবসময় কাজ করে না। আমাদের বডি ক্লক বা 'আল্ট্রাডিয়ান রিদম' (Ultradian Rhythm) অনুযায়ী ব্রেইন ৯০-১২০ মিনিটের সাইকেলে কাজ করে।
                         <br>
-                        <span class="text-emerald-300">• প্রোটোকল:</span> ৯০ মিনিটের 'ডিপ ওয়ার্ক ব্লক' (Deep Work Block)। এই সময় ফোন সাইলেন্ট থাকবে। এরপর ২০-৩০ মিনিটের ব্রেক। এতে ম্যারাথন স্টাডির স্ট্যামিনা তৈরি হয়।
+                        <span class="text-emerald-400 block mt-2 font-medium">• প্রোটোকল: ৯০ মিনিটের 'ডিপ ওয়ার্ক ব্লক' (Deep Work Block)। এই সময় ফোন সাইলেন্ট থাকবে। এরপর ২০-৩০ মিনিটের ব্রেক। এতে ম্যারাথন স্টাডির স্ট্যামিনা তৈরি হয়।</span>
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🌡️ ৪. এনভায়রনমেন্ট ও ফিজিওলজি: হলের বাস্তবতা ও সলিউশন</h1>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🌡️ ৪. এনভায়রনমেন্ট ও ফিজিওলজি: হলের বাস্তবতা ও সলিউশন</h1>
                     
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৪.১ থার্মাল স্ট্রেস ও ব্রেইন ফাংশন</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৪.১ থার্মাল স্ট্রেস ও ব্রেইন ফাংশন</h3>
+                    <p class="mb-4 text-gray-300">
                         গরম ও হিউমিড ওয়েদারে ব্রেইন কুল রাখার জন্য ব্লাড স্কিনের দিকে চলে যায়, ফলে ব্রেইনে অক্সিজেন সাপ্লাই কমে। ডিহাইড্রেশন বা পানিশূন্যতা মেমোরি ২০% পর্যন্ত কমিয়ে দিতে পারে।
                         <br>
-                        <span class="text-emerald-300">• সলিউশন:</span> পড়ার টেবিলে সবসময় পানির বোতল রাখা। ওযু বা ঠান্ডা পানির ঝাপটা ব্রেইনের টেম্পারেচার কমাতে খুব ইফেক্টিভ।
+                        <span class="text-emerald-400 font-medium">• সলিউশন:</span> পড়ার টেবিলে সবসময় পানির বোতল রাখা। ওযু বা ঠান্ডা পানির ঝাপটা ব্রেইনের টেম্পারেচার কমাতে খুব ইফেক্টিভ।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৪.২ পাওয়ার ন্যাপ বা 'কাইলুলাহ'</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৪.২ পাওয়ার ন্যাপ বা 'কাইলুলাহ'</h3>
+                    <p class="mb-6 text-gray-300">
                         ইউনিভার্সিটিতে ক্লাস শেষে দুপুরের পর এনার্জি ক্র্যাশ করা স্বাভাবিক। ইসলামে একে 'কাইলুলাহ' (Qailulah) বলা হয়, আর সায়েন্স বলে 'পাওয়ার ন্যাপ' (Power Nap)।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Sleep/Nap -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of Power Nap">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 4.1: Optimal Nap Duration (20 mins)</p>
                     </div>
-                    <p class="mb-4">
-                        <span class="text-emerald-300">• বেনিফিট:</span> ১৫-২০ মিনিটের ন্যাপ অ্যালার্টনেস ৩৪% বাড়ায়। তবে ৩০ মিনিটের বেশি ঘুমানো যাবে না, তাহলে উল্টো মাথা ভার হয়ে যাবে (Sleep Inertia)।
+
+                    <p class="mb-6 text-gray-300">
+                        <span class="text-emerald-400 font-medium">• বেনিফিট:</span> ১৫-২০ মিনিটের ন্যাপ অ্যালার্টনেস ৩৪% বাড়ায়। তবে ৩০ মিনিটের বেশি ঘুমানো যাবে না, তাহলে উল্টো মাথা ভার হয়ে যাবে (Sleep Inertia)।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৪.৩ কোলাহল ম্যানেজমেন্ট ও অডিটরি গেটিং</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ৪.৩ কোলাহল ম্যানেজমেন্ট ও অডিটরি গেটিং</h3>
+                    <p class="mb-8 text-gray-300">
                         মেস বা হলের নয়েজ এড়াতে 'হোয়াইট নয়েজ' (White Noise) বা রেইন সাউন্ড শোনা যেতে পারে ইয়ারফোন দিয়ে। পড়ার টেবিল দেওয়ালের দিকে ফেস করে রাখলে 'ভিজুয়াল ক্লাটার' (Visual Clutter) কমে, যা কনসেন্ট্রেশন বাড়ায়।
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🥗 ৫. নিউট্রিশনাল সাইকিয়াট্রি: স্টুডেন্টদের ব্রেইন ফুড</h1>
-                    <p class="mb-4">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🥗 ৫. নিউট্রিশনাল সাইকিয়াট্রি: স্টুডেন্টদের ব্রেইন ফুড</h1>
+                    <p class="mb-6 text-gray-300">
                         হলের ডাইনিং বা রাস্তার খাবার আপনার ব্রেইনকে স্লো করে দিচ্ছে কি না, তা চেক করা জরুরি।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৫.১ গ্লাইসেমিক ইনডেক্স ও 'ভাত-ঘুম'</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৫.১ গ্লাইসেমিক ইনডেক্স ও 'ভাত-ঘুম'</h3>
+                    <p class="mb-6 text-gray-300">
                         দুপুরে অতিরিক্ত ভাত বা কার্বোহাইড্রেট খেলে ব্লাড সুগার স্পাইক করে এবং পরে দ্রুত ফল করে। একে 'সুগার ক্র্যাশ' (Sugar Crash) বলে, যার ফলে দুপুরের ক্লাসে বা পড়ার টেবিলে তীব্র ঘুম পায়।
                         <br>
-                        <span class="text-emerald-300">• প্রোটোকল:</span> দুপুরের মিল-এ ভাতের পরিমাণ কমিয়ে ডাল, সবজি বা প্রোটিন বাড়ানো।
+                        <span class="text-emerald-400 font-medium">• প্রোটোকল:</span> দুপুরের মিল-এ ভাতের পরিমাণ কমিয়ে ডাল, সবজি বা প্রোটিন বাড়ানো।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Food -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of Nutrition">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 5.1: Low Glycemic Diet</p>
                     </div>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৫.২ ট্রান্স ফ্যাট ও স্ট্রিট ফুড</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৫.২ ট্রান্স ফ্যাট ও স্ট্রিট ফুড</h3>
+                    <p class="mb-6 text-gray-300">
                         সিঙ্গারা, পুরি বা ভাজাভুজিতে প্রচুর 'ট্রান্স ফ্যাট' (Trans Fat) থাকে। এটি ব্রেইনের ইনফ্ল্যামেশন বাড়ায় এবং নিউরনের ফ্লেক্সিবিলিটি কমিয়ে দেয়, যা নতুন কিছু শেখার জন্য বাধা। পরীক্ষার আগে এসব খাবার এভয়েড করা বুদ্ধিমানের কাজ।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৫.৩ সুন্নাহ ফুড ও মেমোরি বুস্টার</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৫.৩ সুন্নাহ ফুড ও মেমোরি বুস্টার</h3>
+                    <p class="mb-6 text-gray-300">
                         মধু (তাৎক্ষণিক গ্লুকোজ ও অ্যান্টিঅক্সিডেন্ট), কালোজিরা (নিউরোপ্রোটেক্টিভ), এবং খেজুর (পটাশিয়াম ও এনার্জি)—এগুলো সস্তা কিন্তু ব্রেইনের জন্য সুপারফুড বা 'নোট্রপিকস' (Nootropics)।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৫.৪ ক্যাফেইন স্ট্র্যাটেজি</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ৫.৪ ক্যাফেইন স্ট্র্যাটেজি</h3>
+                    <p class="mb-8 text-gray-300">
                         বিকেল ৫টার পর চা/কফি খাওয়া উচিত নয়। ক্যাফেইন শরীরে ৬-৮ ঘণ্টা থাকে, যা রাতের 'ডিপ স্লিপ' (Deep Sleep) নষ্ট করে। আর এই ডিপ স্লিপেই সারাদিনের পড়া মেমোরিতে সেভ হয়।
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🤲 ৬. স্পিরিচুয়াল সাইকোলজি: মেন্টাল পিস ও রেজিলিয়েন্স</h1>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🤲 ৬. স্পিরিচুয়াল সাইকোলজি: মেন্টাল পিস ও রেজিলিয়েন্স</h1>
                     
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৬.১ সালাত: আল্টিমেট কগনিটিভ রিসেট</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৬.১ সালাত: আল্টিমেট কগনিটিভ রিসেট</h3>
+                    <p class="mb-6 text-gray-300">
                         টানা কাজের মাঝে ব্রেক নেওয়া জরুরি। পাঁচ ওয়াক্ত সালাত সেই 'প্যাটার্ন ইন্টারপাস' (Pattern Interrupt) হিসেবে কাজ করে। এটি স্ট্রেস হরমোন বা কর্টিসল কমায় এবং ব্রেইনে রক্ত সঞ্চালন বাড়ায়।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Prayer/Peace -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of Spirituality">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 6.1: Cognitive Reset through Prayer</p>
                     </div>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৬.২ ওযু ও ম্যামালিয়ান ডাইভ রিফ্লেক্স</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৬.২ ওযু ও ম্যামালিয়ান ডাইভ রিফ্লেক্স</h3>
+                    <p class="mb-6 text-gray-300">
                         প্রেজেন্টেশন বা ভাইভা-র আগে টেনশন হলে ওযু করা যেতে পারে। মুখে ঠান্ডা পানি দিলে 'ম্যামালিয়ান ডাইভ রিফ্লেক্স' (Mammalian Dive Reflex) অন হয়, যা হার্ট রেট কমিয়ে নার্ভাস সিস্টেমকে শান্ত করে।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৬.৩ তাহাজ্জুদ: গোল্ডেন আওয়ার</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৬.৩ তাহাজ্জুদ: গোল্ডেন আওয়ার</h3>
+                    <p class="mb-6 text-gray-300">
                         ভোর ৩:৩০-৫:০০টা—এই সময়টা 'ডিপ ওয়ার্ক'-এর জন্য সেরা। সাইলেন্ট এনভায়রনমেন্ট এবং ব্রেইনের 'কর্টিসল অ্যাওয়েকেনিং রেসপন্স' (CAR) জটিল সাবজেক্ট বা প্রোগ্রামিং লজিক বোঝার জন্য বেস্ট টাইম।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৬.৪ তাওয়াক্কুল ও কগনিটিভ ডিফিউশন</h3>
-                    <p class="mb-6">
+                    <h3 class="text-xl font-semibold">❖ ৬.৪ তাওয়াক্কুল ও কগনিটিভ ডিফিউশন</h3>
+                    <p class="mb-8 text-gray-300">
                         "জব না পেলে কী হবে?" বা "সিজিপিএ কমলে কী হবে?"—এই চিন্তাগুলো 'ওয়ার্কিং মেমোরি' জ্যাম করে দেয়। ইসলামে 'তাওয়াক্কুল' (চেষ্টার পর ফলাফল আল্লাহর ওপর ছাড়া) এবং সাইকোলজিতে 'কগনিটিভ ডিফিউশন' একই কাজ করে—ফলাফলের চিন্তা মাথা থেকে নামিয়ে প্রসেসে ফোকাস করা।
                     </p>
 
-                    <h1 class="text-3xl font-bold text-white mt-12 mb-6 border-b border-dark-700 pb-4">🚧 ৭. কমন চ্যালেঞ্জ ও সমাধান</h1>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-16 mb-8 border-b border-gray-700 pb-6">🚧 ৭. কমন চ্যালেঞ্জ ও সমাধান</h1>
                     
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৭.১ জাইগারনিক এফেক্ট (Zeigarnik Effect)</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৭.১ জাইগারনিক এফেক্ট (Zeigarnik Effect)</h3>
+                    <p class="mb-6 text-gray-300">
                         অসমাপ্ত অ্যাসাইনমেন্টের চিন্তা রাতে ঘুমাতে দেয় না। ব্রেইন ইনকমপ্লিট কাজগুলো লুপে চালাতে থাকে।
                         <br>
-                        <span class="text-emerald-300">• ফিক্স:</span> ঘুমানোর আগে আগামীকালের টু-ডু লিস্ট (To-Do List) লিখে ফেলা। এতে ব্রেইন রিল্যাক্স হয় যে কাজের প্ল্যান করা হয়েছে।
+                        <span class="text-emerald-400 font-medium">• ফিক্স:</span> ঘুমানোর আগে আগামীকালের টু-ডু লিস্ট (To-Do List) লিখে ফেলা। এতে ব্রেইন রিল্যাক্স হয় যে কাজের প্ল্যান করা হয়েছে।
                     </p>
 
-                    <h3 class="text-xl font-semibold text-emerald-400">❖ ৭.২ ডোপামিন ডিটক্স</h3>
-                    <p class="mb-4">
+                    <h3 class="text-xl font-semibold">❖ ৭.২ ডোপামিন ডিটক্স</h3>
+                    <p class="mb-6 text-gray-300">
                         রিলস বা শর্টস দেখা ব্রেইনের রিওয়ার্ড সিস্টেম নষ্ট করে দেয়। পড়ার সময় ফোনটি অন্য রুমে রাখা বা 'ফরেস্ট' (Forest) অ্যাপ ব্যবহার করা যেতে পারে।
                     </p>
-                    <div class="img-placeholder">
-                        
+                    
+                    <!-- SVG Illustration: Phone Block -->
+                    <div class="svg-illustration-container" role="img" aria-label="Illustration of Dopamine Detox">
+                        <svg class="svg-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-500">Figure 7.1: Eliminate Digital Distractions</p>
                     </div>
                 </div>
-            </div>
+            </article>
         </div>
     </section>
 
-    <footer class="bg-black text-white py-10 border-t border-dark-700">
+    <!-- Footer -->
+    <footer class="bg-dark-950 text-white py-12 border-t border-dark-800 relative z-10">
         <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="mb-2 text-lg font-bold text-emerald-500">Deep Focus Protocol</p>
-            <p class="text-gray-500 text-sm mb-4">Science of Behavioral Change for Students</p>
-            <p class="text-gray-600 text-xs">&copy; 2025 Deep Focus Research. Based on Cognitive Behavioral Science.</p>
+            <div class="mb-6 flex justify-center items-center">
+                 <svg class="w-8 h-8 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                 <span class="text-2xl font-bold tracking-tight">DeepFocus</span>
+            </div>
+            <p class="text-gray-500 text-sm mb-6 max-w-md mx-auto">Science of Behavioral Change for Students. Built on Neurobiology and Islamic Principles.</p>
+            <p class="text-gray-700 text-xs">&copy; 2025 Deep Focus Research. Based on Cognitive Behavioral Science.</p>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script>
-        // Set Chart defaults for Dark Mode
+        // --- Chart Config for Dark Grid Theme ---
         Chart.defaults.color = '#9CA3AF';
-        Chart.defaults.borderColor = '#374151';
+        Chart.defaults.borderColor = 'rgba(55, 65, 81, 0.5)';
+        Chart.defaults.font.family = '"Noto Sans Bengali", sans-serif';
 
         // --- Navigation Logic ---
         function scrollToSection(id) {
             const element = document.getElementById(id);
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
+                // Adjust for sticky header
+                const offset = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
         }
 
-        // --- Tab Switching Logic ---
+        // --- Mobile Menu Toggle ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('mobile-menu-btn');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('animate-fade-in-up');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+
+        // --- Tab Switching Logic (with animation reset) ---
         function switchTab(tabId) {
             ['prep', 'perf', 'pres'].forEach(id => {
-                document.getElementById(`content-${id}`).classList.add('hidden');
-                document.getElementById(`content-${id}`).classList.remove('block');
+                const content = document.getElementById(`content-${id}`);
+                content.classList.add('hidden');
                 
                 const tabBtn = document.getElementById(`tab-${id}`);
                 tabBtn.classList.remove('active-tab');
                 tabBtn.classList.add('inactive-tab');
             });
 
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
-            document.getElementById(`content-${tabId}`).classList.add('block');
+            const targetContent = document.getElementById(`content-${tabId}`);
+            targetContent.classList.remove('hidden');
+            
+            // Re-trigger animation
+            targetContent.classList.remove('animate-fade-in-up');
+            void targetContent.offsetWidth; // Force reflow
+            targetContent.classList.add('animate-fade-in-up');
 
             const activeBtn = document.getElementById(`tab-${tabId}`);
             activeBtn.classList.remove('inactive-tab');
@@ -543,8 +804,15 @@
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            document.getElementById('timerDisplay').innerText = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const display = document.getElementById('timerDisplay');
+            display.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Visual feedback when running
+            if(isRunning) {
+                display.classList.add('text-emerald-400');
+            } else {
+                display.classList.remove('text-emerald-400');
+            }
         }
 
         function startTimer() {
@@ -552,9 +820,11 @@
             
             const btn = document.getElementById('startBtn');
             btn.innerText = "চলছে...";
-            btn.classList.add('opacity-75');
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
             
             isRunning = true;
+            updateTimerDisplay(); // immediate color update
+            
             timerInterval = setInterval(() => {
                 if (timeLeft > 0) {
                     timeLeft--;
@@ -575,14 +845,18 @@
             updateTimerDisplay();
             const btn = document.getElementById('startBtn');
             btn.innerText = "শুরু";
-            btn.classList.remove('opacity-75');
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
         }
 
         // --- Charts Initialization ---
         document.addEventListener('DOMContentLoaded', function() {
             
-            // Chart 1: The Problem
+            // Chart 1: The Problem (Updated Colors)
             const ctxProblem = document.getElementById('problemChart').getContext('2d');
+            const problemGradient = ctxProblem.createLinearGradient(0, 0, 0, 300);
+            problemGradient.addColorStop(0, '#34D399');
+            problemGradient.addColorStop(1, '#064E3B');
+
             new Chart(ctxProblem, {
                 type: 'bar',
                 data: {
@@ -591,13 +865,18 @@
                         {
                             label: 'টেবিলে বসা (ঘণ্টা)',
                             data: [10, 8],
-                            backgroundColor: '#374151',
-                            borderWidth: 0
+                            backgroundColor: '#1F2937',
+                            hoverBackgroundColor: '#374151',
+                            borderRadius: 6,
+                            borderWidth: 1,
+                            borderColor: '#374151'
                         },
                         {
                             label: 'কার্যকরী পড়া (ঘণ্টা)',
                             data: [2.5, 7],
-                            backgroundColor: '#10B981', // Emerald 500
+                            backgroundColor: problemGradient,
+                            hoverBackgroundColor: '#10B981',
+                            borderRadius: 6,
                             borderWidth: 0
                         }
                     ]
@@ -605,20 +884,29 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9CA3AF' } }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: '#374151' }
+                            grid: { color: 'rgba(55, 65, 81, 0.3)' },
+                            ticks: { color: '#9CA3AF' }
                         },
                         x: {
-                            grid: { display: false }
+                            grid: { display: false },
+                            ticks: { color: '#9CA3AF' }
                         }
                     }
                 }
             });
 
-            // Chart 2: Sleep/Retention
+            // Chart 2: Sleep/Retention (Updated Colors)
             const ctxSleep = document.getElementById('sleepChart').getContext('2d');
+            const sleepGradient = ctxSleep.createLinearGradient(0, 0, 0, 300);
+            sleepGradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo
+            sleepGradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
             new Chart(ctxSleep, {
                 type: 'line',
                 data: {
@@ -626,25 +914,35 @@
                     datasets: [{
                         label: 'মেমোরি রিটেনশন হার (%)',
                         data: [95, 85, 40, 20],
-                        borderColor: '#6366F1', // Indigo 500
-                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: '#818CF8', // Indigo 400
+                        backgroundColor: sleepGradient,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366F1',
+                        pointRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        title: { display: true, text: 'ঘুম ও মেমোরি রিটেনশন' }
+                        title: { display: true, text: 'ঘুম ও মেমোরি রিটেনশন', color: '#E5E7EB' },
+                        legend: { labels: { color: '#9CA3AF' } }
                     },
                     scales: {
-                        y: { grid: { color: '#374151' } },
-                        x: { grid: { display: false } }
+                        y: { 
+                            grid: { color: 'rgba(55, 65, 81, 0.3)' },
+                            ticks: { color: '#9CA3AF' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#9CA3AF' }
+                        }
                     }
                 }
             });
         });
     </script>
 </body>
-</html>
+    </html>
